@@ -18,13 +18,17 @@ with open(text, encoding='utf-8') as f:
 class Story:
 
     def __init__(self):
-        body_array = None
+        body = None
+        body_array = None # holds array of arrays of raw paragraphs
 
     def readStory(self, story_file):
         pass
 
     def addParagraph(self, paragraph_array):
         pass
+
+    def setBody(self, input_array):
+        self.body = input_array
 
 
 class Paragraph: 
@@ -59,7 +63,7 @@ class Paragraph:
         return self.paragraph
 
     def convertArrayToString(self):
-        self.setParagraphString(' '.join(self.paragraph_array))
+        self.setParagraphString(' '.join(self.paragraph_array).replace('\n',''))
 
     def convertStringToSentenceArray(self):
         thirties = re.compile(r'303030')
