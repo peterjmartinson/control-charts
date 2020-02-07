@@ -18,8 +18,9 @@ with open(text, encoding='utf-8') as f:
 class Story:
 
     def __init__(self):
-        body = None
-        body_array = None # holds array of arrays of raw paragraphs
+        self.body_raw   = None
+        self.body_array = None # holds array of arrays of raw paragraphs
+        self.body       = [] # holds the list of Paragraph objects
 
     def readStory(self, story_file):
         pass
@@ -28,7 +29,40 @@ class Story:
         pass
 
     def setBody(self, input_array):
-        self.body = input_array
+        self.body_raw = input_array
+
+    def getBody(self):
+        return self.body
+
+    def isNewline(self, test_string):
+        if test_string == '\n':
+            return True
+        else:
+            return False
+
+    def createBodyList(self):
+        for element in self.body_raw:
+            pass
+
+    def convertParagraphListToObject(self, input_list):
+        return Paragraph(input_list)
+
+    def appendParagraphToBody(self, paragraph):
+        self.body.append(paragraph)
+        return self.body
+
+    def processRawBody(self):
+        temp_paragraph_list = []
+        pass
+        for line in self.body_raw:
+            if self.isNewline(line):
+                self.appendParagraphToBody(self.convertParagraphListToObject(temp_paragraph_list))
+                temp_paragraph_list = []
+            else:
+                temp_paragraph_list.append(line)
+        if len(temp_paragraph_list) > 1:
+            self.appendParagraphToBody(self.convertParagraphListToObject(temp_paragraph_list))
+
 
 
 class Paragraph: 
