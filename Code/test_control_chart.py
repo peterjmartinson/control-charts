@@ -65,6 +65,12 @@ def Story():
     return Story()
 
 
+@pytest.fixture
+def Chart():
+    from control_chart import Chart
+    return Chart()
+
+
 class TestCanary:
     
     def test_Tweets(self):
@@ -179,6 +185,17 @@ class Test_Story:
         correct_sentence_count = 7
         result_sentence_count = Story.body[2].sentence_count
         assert result_sentence_count == correct_sentence_count
+
+class Test_Chart:
+
+    def test__Gets_the_story(self, Chart, Story, sample_story_body_list):
+        Story.setBody(sample_story_body_list)
+        Story.processRawBody()
+        story = Chart.getStory()
+        correct_sentence_count = 6
+        result_sentence_count = story.body[2].sentence_count
+        assert result_sentence_count == correct_sentence_count
+
 
 
 ##

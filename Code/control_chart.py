@@ -15,6 +15,14 @@ with open(text, encoding='utf-8') as f:
             print(line)
     print(story)
 
+class Chart:
+
+    def __init__(self):
+        pass
+
+    def getStory(self):
+        return Story()
+
 class Story:
 
     def __init__(self):
