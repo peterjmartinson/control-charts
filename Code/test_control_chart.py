@@ -186,15 +186,74 @@ class Test_Story:
         result_sentence_count = Story.body[2].sentence_count
         assert result_sentence_count == correct_sentence_count
 
-class Test_Chart:
-
-    def test__Gets_the_story(self, Chart, Story, sample_story_body_list):
+    def test__Sets_total_sentence_count(self, Story, sample_story_body_list):
         Story.setBody(sample_story_body_list)
         Story.processRawBody()
-        story = Chart.getStory()
-        correct_sentence_count = 6
+        result_sentence_count = Story.getSentenceCount()
+        correct_sentence_count = 24
+        assert result_sentence_count == correct_sentence_count
+
+
+    def test__Sets_total_semicolon_count(self, Story, sample_story_body_list):
+        Story.setBody(sample_story_body_list)
+        Story.processRawBody()
+        result_semicolon_count = Story.getSemicolonCount()
+        correct_semicolon_count = 6
+        assert result_semicolon_count == correct_semicolon_count
+
+    def test__Sets_total_dash_count(self, Story, sample_story_body_list):
+        Story.setBody(sample_story_body_list)
+        Story.processRawBody()
+        result_dash_count = Story.getDashCount()
+        correct_dash_count = 9
+        assert result_dash_count == correct_dash_count
+
+    def test__Sets_total_paragraph_count(self, Story, sample_story_body_list):
+        Story.setBody(sample_story_body_list)
+        Story.processRawBody()
+        result_paragraph_count = Story.getParagraphCount()
+        correct_paragraph_count = 3
+        assert result_paragraph_count == correct_paragraph_count
+
+class Test_Chart:
+
+    def test__Gets_the_story(self, Story, sample_story_body_list):
+        from control_chart import Chart
+        chart = Chart(sample_story_body_list)
+        story = chart.getStory()
+        correct_sentence_count = 7
         result_sentence_count = story.body[2].sentence_count
         assert result_sentence_count == correct_sentence_count
+
+    def test__Calculates_semicolon_center_line(self, Chart, Story, sample_story_body_list):
+        from control_chart import Chart
+        chart = Chart(sample_story_body_list)
+        story = chart.getStory()
+        chart.setCenterLine()
+        result_center_line = chart.getCenterLine()
+        correct_center_line = 6/24
+        assert result_center_line == correct_center_line
+
+    def test__Calculates_dash_center_line(self, Chart, Story, sample_story_body_list):
+        from control_chart import Chart
+        chart = Chart(sample_story_body_list)
+        story = chart.getStory()
+        chart.setCenterLine(mark='dash')
+        result_center_line = chart.getCenterLine()
+        correct_center_line = 9/24
+        assert result_center_line == correct_center_line
+
+    def test__Calculates_semicolon_upper_control_line(self):
+        assert 1 == 0
+
+    def test__Calculates_semicolon_lower_control_line(self):
+        pass
+
+    def test__Calculates_dash_upper_control_line(self):
+        pass
+
+    def test__Calculates_dash_lower_control_line(self):
+        pass
 
 
 

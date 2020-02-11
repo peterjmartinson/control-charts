@@ -17,18 +17,88 @@ with open(text, encoding='utf-8') as f:
 
 class Chart:
 
-    def __init__(self):
-        pass
+    def __init__(self, input_text=None):
+        self.story = None
+        self.center_line = None
+        if input_text:
+            self.setStory(input_text)
+
+    def setStory(self, input_text):
+        self.story = Story(input_text)
+        return 1
 
     def getStory(self):
-        return Story()
+        return self.story
+
+    def getCenterLine(self, mark='semicolon'):
+        if self.center_line == None:
+            self.setCenterLine(mark)
+        return self.center_line
+
+    def setCenterLine(self, mark='semicolon'):
+        sentence_count = self.story.getSentenceCount()
+        mark_count = None
+        if mark == 'semicolon':
+            mark_count = self.story.getSemicolonCount()
+        if mark == 'dash':
+            mark_count = self.story.getDashCount()
+        self.center_line = mark_count / sentence_count
 
 class Story:
 
-    def __init__(self):
+    def __init__(self, input_body_list=None):
         self.body_raw   = None
         self.body_array = None # holds array of arrays of raw paragraphs
         self.body       = [] # holds the list of Paragraph objects
+        self.sentence_count = None
+        self.paragraph_count = None
+        self.semicolon_count = None
+        self.dash_count = None
+        if input_body_list:
+            self.setBody(input_body_list)
+            self.processRawBody()
+
+
+    def setSentenceCount(self):
+        sentence_count = 0
+        for paragraph in self.body:
+            sentence_count += paragraph.sentence_count
+        self.sentence_count = sentence_count
+
+    def getSentenceCount(self):
+        if self.sentence_count == None:
+            self.setSentenceCount()
+        return self.sentence_count
+
+    def setSemicolonCount(self):
+        semicolon_count = 0
+        for paragraph in self.body:
+            semicolon_count += paragraph.semicolon_count
+        self.semicolon_count = semicolon_count
+
+    def getSemicolonCount(self):
+        if self.semicolon_count == None:
+            self.setSemicolonCount()
+        return self.semicolon_count
+
+    def setDashCount(self):
+        dash_count = 0
+        for paragraph in self.body:
+            dash_count += paragraph.dash_count
+        self.dash_count = dash_count
+
+    def getDashCount(self):
+        if self.dash_count == None:
+            self.setDashCount()
+        return self.dash_count
+
+    def setParagraphCount(self):
+        self.paragraph_count = len(self.body)
+
+    def getParagraphCount(self):
+        if self.paragraph_count == None:
+            self.setParagraphCount()
+        return self.paragraph_count
 
     def readStory(self, story_file):
         pass
