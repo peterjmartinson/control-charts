@@ -41,7 +41,7 @@ def sample_story_body_list():
             'sodales et; Suspendisse ut ante elementum, dapibus justo in, lacinia libero. In\n',
             'hac habitasse platea dictumst. Sed rutrum eros quis posuere gravida; Ut eu odio\n',
             'feugiat -- laoreet arcu non, aliquet odio. In quis elit vel metus dictum\n',
-            'ultricies. Suspendisse iaculis bibendum vestibulum.\n', # 9 sentences
+            'ultricies. Suspendisse iaculis bibendum vestibulum.\n', # 9 sentences, 2 semicolons, 3 dashes
             '\n',
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit? Cras varius -- sit amet\n',
             'nulla id porttitor. In a diam enim! Interdum et malesuada fames ac ante ipsum\n',
@@ -49,7 +49,7 @@ def sample_story_body_list():
             'sodales et; Suspendisse ut ante elementum, dapibus justo in, lacinia libero. In\n',
             'hac habitasse platea dictumst. Sed rutrum eros quis posuere gravida; Ut eu odio\n',
             'feugiat -- laoreet arcu non, aliquet odio. In quis elit vel metus dictum\n',
-            'ultricies.\n', # 8 sentences
+            'ultricies.\n', # 8 sentences, 2 semicolons, 3 dashes
             '\n',
             'Cras varius -- sit amet\n',
             'nulla id porttitor. In a diam enim! Interdum et malesuada fames ac ante ipsum\n',
@@ -57,7 +57,7 @@ def sample_story_body_list():
             'sodales et; Suspendisse ut ante elementum, dapibus justo in, lacinia libero. In\n',
             'hac habitasse platea dictumst. Sed rutrum eros quis posuere gravida; Ut eu odio\n',
             'feugiat -- laoreet arcu non, aliquet odio. In quis elit vel metus dictum\n',
-            'ultricies.\n'] # 7 sentences
+            'ultricies.\n'] # 7 sentences, 2 semicolons
 
 @pytest.fixture
 def Story():
@@ -215,6 +215,28 @@ class Test_Story:
         correct_paragraph_count = 3
         assert result_paragraph_count == correct_paragraph_count
 
+    def test__Sets_sentence_count_array(self, Story, sample_story_body_list):
+        Story.setBody(sample_story_body_list)
+        Story.processRawBody()
+        sentence_count_array = Story.getSentenceCountArray()
+        correct_sentence_count_array = np.array([9,8,7])
+        npt.assert_array_equal(sentence_count_array, correct_sentence_count_array)
+
+    def test__Sets_semicolon_count_array(self, Story, sample_story_body_list):
+        Story.setBody(sample_story_body_list)
+        Story.processRawBody()
+        semicolon_count_array = Story.getSemicolonCountArray()
+        correct_semicolon_count_array = np.array([2,2,2])
+        npt.assert_array_equal(semicolon_count_array, correct_semicolon_count_array)
+        
+    def test__Sets_dash_count_array(self, Story, sample_story_body_list):
+        Story.setBody(sample_story_body_list)
+        Story.processRawBody()
+        dash_count_array = Story.getDashCountArray()
+        correct_dash_count_array = np.array([3,3,3])
+        npt.assert_array_equal(dash_count_array, correct_dash_count_array)
+
+
 class Test_Chart:
 
     def test__Gets_the_story(self, Story, sample_story_body_list):
@@ -236,15 +258,69 @@ class Test_Chart:
 
     def test__Calculates_dash_center_line(self, Chart, Story, sample_story_body_list):
         from control_chart import Chart
-        chart = Chart(sample_story_body_list)
+        chart = Chart(sample_story_body_list, mark='dash')
         story = chart.getStory()
-        chart.setCenterLine(mark='dash')
+        chart.setCenterLine()
         result_center_line = chart.getCenterLine()
         correct_center_line = 9/24
         assert result_center_line == correct_center_line
 
-    def test__Calculates_semicolon_upper_control_line(self):
-        assert 1 == 0
+    def test__Gets_sentence_count_array(self, Story, sample_story_body_list):
+        from control_chart import Chart
+        chart = Chart(sample_story_body_list)
+        result_array = chart.getSentenceCountArray()
+        correct_array = np.array([9,8,7])
+        npt.assert_array_equal(result_array, correct_array)
+
+    def test__Gets_semicolon_count_array(self, Story, sample_story_body_list):
+        from control_chart import Chart
+        chart = Chart(sample_story_body_list)
+        result_array = chart.getSemicolonCountArray()
+        correct_array = np.array([2,2,2])
+        npt.assert_array_equal(result_array, correct_array)
+
+    def test__Gets_dash_count_array(self, Story, sample_story_body_list):
+        from control_chart import Chart
+        chart = Chart(sample_story_body_list)
+        result_array = chart.getDashCountArray()
+        correct_array = np.array([3,3,3])
+        npt.assert_array_equal(result_array, correct_array)
+
+    def test__Calculates_semicolon_y_values(self, Chart, Story, sample_story_body_list):
+        from control_chart import Chart
+        chart = Chart(sample_story_body_list)
+        story = chart.getStory()
+        result_y = chart.getY()
+        correct_y = np.array([2/9, 2/8, 2/7])
+        npt.assert_array_equal(result_y, correct_y)
+
+    def test__Calculates_dash_y_values(self, Chart, Story, sample_story_body_list):
+        from control_chart import Chart
+        chart = Chart(sample_story_body_list, mark='dash')
+        story = chart.getStory()
+        result_y = chart.getY()
+        correct_y = np.array([3/9, 3/8, 3/7])
+        npt.assert_array_equal(result_y, correct_y)
+
+    def test__Calculates_semicolon_upper_control_limit(self, Chart, Story, sample_story_body_list):
+        from control_chart import Chart
+        chart = Chart(sample_story_body_list)
+        story = chart.getStory()
+        center_line = 6/24 # for semicolons
+        sentence_count = np.array([9,8,7])
+        result_upper_control_limit = chart.getUpperControlLimit()
+        correct_upper_control_limit = center_line+3*np.sqrt(center_line*(1-center_line)/sentence_count)
+        npt.assert_array_equal(result_upper_control_limit, correct_upper_control_limit)
+
+    def test__Calculates_dash_upper_control_limit(self, Chart, Story, sample_story_body_list):
+        from control_chart import Chart
+        chart = Chart(sample_story_body_list, mark='dash')
+        story = chart.getStory()
+        center_line = 9/24 # for dashes
+        sentence_count = np.array([9,8,7])
+        result_upper_control_limit = chart.getUpperControlLimit()
+        correct_upper_control_limit = center_line+3*np.sqrt(center_line*(1-center_line)/sentence_count)
+        npt.assert_array_equal(result_upper_control_limit, correct_upper_control_limit)
 
     def test__Calculates_semicolon_lower_control_line(self):
         pass

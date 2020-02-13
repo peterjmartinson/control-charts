@@ -17,9 +17,10 @@ with open(text, encoding='utf-8') as f:
 
 class Chart:
 
-    def __init__(self, input_text=None):
+    def __init__(self, input_text=None, mark='semicolon'):
         self.story = None
         self.center_line = None
+        self.mark = mark
         if input_text:
             self.setStory(input_text)
 
@@ -30,19 +31,43 @@ class Chart:
     def getStory(self):
         return self.story
 
-    def getCenterLine(self, mark='semicolon'):
+    def getCenterLine(self):
         if self.center_line == None:
-            self.setCenterLine(mark)
+            self.setCenterLine()
         return self.center_line
 
-    def setCenterLine(self, mark='semicolon'):
+    def setCenterLine(self):
         sentence_count = self.story.getSentenceCount()
         mark_count = None
-        if mark == 'semicolon':
+        if self.mark == 'semicolon':
             mark_count = self.story.getSemicolonCount()
-        if mark == 'dash':
+        if self.mark == 'dash':
             mark_count = self.story.getDashCount()
         self.center_line = mark_count / sentence_count
+
+    def getSentenceCountArray(self):
+        return self.story.getSentenceCountArray()
+
+    def getSemicolonCountArray(self):
+        return self.story.getSemicolonCountArray()
+
+    def getDashCountArray(self):
+        return self.story.getDashCountArray()
+
+    def getY(self):
+        if self.mark == 'semicolon':
+            mark_array = self.getSemicolonCountArray()
+        if self.mark == 'dash':
+            mark_array = self.getDashCountArray()
+        sentence_array = self.getSentenceCountArray()
+        return mark_array / sentence_array
+
+    def getUpperControlLimit(self):
+        central_line = self.getCenterLine()
+        sentence_count = self.getSentenceCountArray()
+        control_limit = central_line+3*np.sqrt(central_line*(1-central_line)/sentence_count)
+        return control_limit
+
 
 class Story:
 
@@ -70,6 +95,12 @@ class Story:
             self.setSentenceCount()
         return self.sentence_count
 
+    def getSentenceCountArray(self):
+        output = np.array([])
+        for paragraph in self.body:
+            output = np.append(output, paragraph.sentence_count)
+        return output
+
     def setSemicolonCount(self):
         semicolon_count = 0
         for paragraph in self.body:
@@ -81,6 +112,12 @@ class Story:
             self.setSemicolonCount()
         return self.semicolon_count
 
+    def getSemicolonCountArray(self):
+        output = np.array([])
+        for paragraph in self.body:
+            output = np.append(output, paragraph.semicolon_count)
+        return output
+
     def setDashCount(self):
         dash_count = 0
         for paragraph in self.body:
@@ -91,6 +128,12 @@ class Story:
         if self.dash_count == None:
             self.setDashCount()
         return self.dash_count
+
+    def getDashCountArray(self):
+        output = np.array([])
+        for paragraph in self.body:
+            output = np.append(output, paragraph.dash_count)
+        return output
 
     def setParagraphCount(self):
         self.paragraph_count = len(self.body)
