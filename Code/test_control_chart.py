@@ -228,7 +228,7 @@ class Test_Story:
         semicolon_count_array = Story.getSemicolonCountArray()
         correct_semicolon_count_array = np.array([2,2,2])
         npt.assert_array_equal(semicolon_count_array, correct_semicolon_count_array)
-        
+
     def test__Sets_dash_count_array(self, Story, sample_story_body_list):
         Story.setBody(sample_story_body_list)
         Story.processRawBody()
@@ -247,11 +247,19 @@ class Test_Chart:
         result_sentence_count = story.body[2].sentence_count
         assert result_sentence_count == correct_sentence_count
 
+    def test__Gets_the_story_from_file(self, Story):
+        from control_chart import Chart
+        input_file_name = 'sample_text_body.txt'
+        chart = Chart(filename=input_file_name)
+        story = chart.getStory()
+        correct_sentence_count = 7
+        result_sentence_count = story.body[2].sentence_count
+        assert result_sentence_count == correct_sentence_count
+
     def test__Calculates_semicolon_center_line(self, Chart, Story, sample_story_body_list):
         from control_chart import Chart
         chart = Chart(sample_story_body_list)
         story = chart.getStory()
-        chart.setCenterLine()
         result_center_line = chart.getCenterLine()
         correct_center_line = 6/24
         assert result_center_line == correct_center_line
@@ -260,7 +268,6 @@ class Test_Chart:
         from control_chart import Chart
         chart = Chart(sample_story_body_list, mark='dash')
         story = chart.getStory()
-        chart.setCenterLine()
         result_center_line = chart.getCenterLine()
         correct_center_line = 9/24
         assert result_center_line == correct_center_line
@@ -322,39 +329,26 @@ class Test_Chart:
         correct_upper_control_limit = center_line+3*np.sqrt(center_line*(1-center_line)/sentence_count)
         npt.assert_array_equal(result_upper_control_limit, correct_upper_control_limit)
 
-    def test__Calculates_semicolon_lower_control_line(self):
-        pass
+    def test__Calculates_semicolon_lower_control_limit(self, Chart, Story, sample_story_body_list):
+        from control_chart import Chart
+        chart = Chart(sample_story_body_list)
+        story = chart.getStory()
+        center_line = 6/24 # for semicolons
+        sentence_count = np.array([9,8,7])
+        result_lower_control_limit = chart.getLowerControlLimit()
+        correct_lower_control_limit = center_line-3*np.sqrt(center_line*(1-center_line)/sentence_count)
+        correct_lower_control_limit = np.where(correct_lower_control_limit < 0, 0, correct_lower_control_limit)
+        npt.assert_array_equal(result_lower_control_limit, correct_lower_control_limit)
 
-    def test__Calculates_dash_upper_control_line(self):
-        pass
+    def test__Calculates_dash_lower_control_limit(self, Chart, Story, sample_story_body_list):
+        from control_chart import Chart
+        chart = Chart(sample_story_body_list, mark='dash')
+        story = chart.getStory()
+        center_line = 9/24 # for dashes
+        sentence_count = np.array([9,8,7])
+        result_lower_control_limit = chart.getLowerControlLimit()
+        correct_lower_control_limit = center_line-3*np.sqrt(center_line*(1-center_line)/sentence_count)
+        correct_lower_control_limit = np.where(correct_lower_control_limit < 0, 0, correct_lower_control_limit)
+        npt.assert_array_equal(result_lower_control_limit, correct_lower_control_limit)
 
-    def test__Calculates_dash_lower_control_line(self):
-        pass
 
-
-
-##
-# 1. Creates an array of all body text
-# 2. Arranges a new list like the following:
-#     [
-#             [paragraph list],
-#             [paragraph list],
-#             ...
-#     ]
-#       
-#     a. `for` loop over items in body_raw
-#     b. append each element to a temporary list
-#     c. When '\n' is reached, append the temporary list to the master list
-#     d. repeat
-# 3. Use a `for` loop to create a new np.array() {body} like the following:
-#     [
-#             Paragraph object,
-#             Paragraph object,
-#             ...
-#     ]
-# 
-#     this step can be broken into phases
-#     a. pick a [paragraph list]
-#     b. Paragraph = Paragraph([paragraph list])
-#     c. Append that new Paragraph to the master list
-##
