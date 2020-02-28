@@ -76,13 +76,38 @@ class Chart:
                          'central line':central_line,
                          'upper limit':upper_limit,
                          'lower limit':lower_limit})
-        fig, (ax1, ax2) = plt.subplots(2, 1, sharex='col')
+        # fig, (ax1, ax2) = plt.subplots(2, 1, sharex='col')
 
-        ax1.step(df['lower limit'].index, df['lower limit'].values, where='mid')
-        ax1.step(df['upper limit'].index, df['upper limit'].values, where='mid')
-        ax1.axhline(self.getCenterLine())
-        ax1.plot(df['data'])
-        ax1.set_ylabel("Semicolons per Sentence")
+        # ax1.step(df['lower limit'].index, df['lower limit'].values, where='mid')
+        # ax1.step(df['upper limit'].index, df['upper limit'].values, where='mid')
+        # ax1.axhline(self.getCenterLine())
+        # ax1.plot(df['data'])
+        # ax1.set_ylabel("Semicolons per Sentence")
+
+        #---------------------------------------------------
+        fig, ax = plt.subplots(1, 1, figsize=(20, 10))
+
+        SMALL_SIZE = 12
+        MEDIUM_SIZE = 14
+        BIGGER_SIZE = 18
+
+        plt.rc('font', size=SMALL_SIZE)          # controls default text sizes
+        plt.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+        plt.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+        plt.rc('xtick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+        plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
+        plt.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+        plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+        ax.step(df['lower limit'].index, df['lower limit'].values, where='mid')
+        ax.step(df['upper limit'].index, df['upper limit'].values, where='mid')
+        ax.axhline(self.getCenterLine())
+        ax.plot(df['data'], marker='o')
+        ax.set(xlabel='Paragraph Number', ylabel='Semicolons per Sentence',
+               title='Semicolons in The Legend of Sleepy Hollow')
+        #---------------------------------------------------
+
+
 
         # fig, (ax1, ax2) = plt.subplots(2, 1, sharex='col')
         # ax1.step(lower_limit.index, lower_limit.values, where='mid')
